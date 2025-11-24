@@ -1,0 +1,744 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { 
+  BookOpen, CheckCircle, ChevronRight, ChevronDown, Book, Users, 
+  Heart, Gavel, History, ListChecks, GraduationCap, Clock, 
+  Trophy, XCircle, ArrowRight, Menu, Search, FileText, Brain,
+  Lightbulb, Bookmark, Share2
+} from 'lucide-react';
+
+// ============================================================================
+// DATABASE BANK SOAL & MATERI (Sesuai Modul & Kisi-Kisi)
+// ============================================================================
+
+const DATA_INDIKATOR = [
+  // --- ELEMEN 1: AL-QUR'AN & HADIS (Modul 1 & 4) ---
+  {
+    id: 1,
+    elemen: "Al-Qur'an Hadis",
+    indikator: "Memahami secara utuh QS. At-Taubah 9:105",
+    sumber: "Modul 10.01 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Inti Sari Materi Modul 1:</strong></p>
+        <p>Ayat ini berisi perintah Allah SWT kepada hamba-Nya untuk <strong>bekerja keras (Etos Kerja)</strong>. Poin kuncinya:</p>
+        <ul class="list-disc ml-5 space-y-1 text-sm">
+          <li>Allah SWT, Rasul-Nya, dan orang-orang mukmin akan <strong>melihat dan menilai</strong> amal/pekerjaan tersebut.</li>
+          <li>Setiap amal akan dimintai pertanggungjawaban di akhirat (dikembalikan kepada Yang Maha Mengetahui yang ghaib dan yang nyata).</li>
+          <li>Larangan untuk bermalas-malasan atau berpangku tangan.</li>
+          <li>Bekerja harus dilakukan dengan <em>cerdas, keras, tuntas, dan ikhlas</em>.</li>
+        </ul>
+        <div class="bg-emerald-50 p-3 rounded border-l-4 border-emerald-500 text-sm italic">
+          "Katakanlah: Bekerjalah kamu, maka Allah dan Rasul-Nya serta orang-orang mukmin akan melihat pekerjaanmu itu..."
+        </div>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Jelaskan isi kandungan QS. At-Taubah 9:105 terkait etos kerja seorang muslim!",
+        jawab: "Ayat ini memerintahkan umat Islam untuk bekerja keras dan berkarya nyata secara sungguh-sungguh. Tidak boleh berpangku tangan, karena segala amal perbuatan akan dilihat dan dinilai oleh Allah, Rasul-Nya, dan orang mukmin, serta akan dipertanggungjawabkan di akhirat kelak."
+      },
+      {
+        tanya: "Mengapa Allah SWT memerintahkan manusia untuk bekerja, padahal rezeki sudah diatur?",
+        jawab: "Bekerja adalah bentuk ikhtiar dan ibadah. Allah memerintahkan bekerja agar manusia bisa mandiri (tidak menjadi beban orang lain), menjaga kehormatan diri, dan hasil kerjanya bisa digunakan untuk bekal ibadah serta menolong sesama (zakat/sedekah)."
+      },
+      {
+        tanya: "Sebutkan perilaku yang mencerminkan pengamalan QS. At-Taubah 9:105 dalam kehidupan pelajar!",
+        jawab: "1. Belajar dengan sungguh-sungguh (tidak mencontek). 2. Disiplin mengerjakan tugas tepat waktu. 3. Aktif dalam kegiatan positif di sekolah (OSIS/Ekstrakurikuler). 4. Tidak mudah putus asa jika nilai jelek, melainkan berusaha memperbaikinya."
+      }
+    ]
+  },
+  {
+    id: 2,
+    elemen: "Al-Qur'an Hadis",
+    indikator: "Menyebutkan hukum bacaan QS. Al-Maidah 5:48",
+    sumber: "Modul 10.01 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Analisis Tajwid (Sesuai Modul):</strong></p>
+        <p>Potongan ayat penting dalam QS. Al-Maidah 5:48 dan hukum bacaannya:</p>
+        <ul class="list-disc ml-5 space-y-2 text-sm">
+          <li><strong>Lii-yab-luwakum</strong> (لِيَبْلُوَكُمْ): <em>Qalqalah Sughra</em> (huruf Ba sukun di tengah kalimat).</li>
+          <li><strong>Fas-tabiqul-khairat</strong> (فَاسْتَبِقُوا الْخَيْرَاتِ): <em>Alif Lam Qamariyah</em> (Al bertemu Kha).</li>
+          <li><strong>Bimaa-anzalallah</strong> (بِمَا أَنْزَلَ اللَّهُ): <em>Mad Jaiz Munfasil</em> (Mad thabi'i bertemu hamzah di lain kata).</li>
+          <li><strong>Mir-rabbik</strong> (مِنْ رَبِّكَ): <em>Idgham Bilaghunnah</em> (Nun sukun bertemu Ra).</li>
+          <li><strong>Hukman</strong> (حُكْمًا): <em>Izhar Syafawi</em> (jika Mim sukun bertemu selain Mim/Ba). *Catatan: Sesuaikan dengan potongan spesifik di soal.*</li>
+        </ul>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Sebutkan 3 hukum bacaan tajwid yang terdapat pada potongan ayat 'Fastabiqul Khairat' dan sekitarnya!",
+        jawab: "1. Alif Lam Qamariyah (pada Al-Khairat). 2. Mad Thabi'i (pada kata Khai-raa-t). 3. Mad Arid Lissukun (jika waqaf di akhir ayat)."
+      },
+      {
+        tanya: "Jelaskan hukum bacaan 'Idgham Bighunnah' dan berikan contohnya dalam konteks ayat Al-Qur'an umum!",
+        jawab: "Idgham Bighunnah terjadi jika Nun Sukun atau Tanwin bertemu salah satu huruf Y, N, M, W (Ya, Nun, Mim, Wau). Cara bacanya dilebur disertai dengung. Contoh: 'May-ya'mal' (Man + Ya'mal)."
+      }
+    ]
+  },
+  {
+    id: 3,
+    elemen: "Al-Qur'an Hadis",
+    indikator: "Menjelaskan manfaat kompetisi dalam kebaikan",
+    sumber: "Modul 10.01 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Manfaat Fastabiqul Khairat:</strong></p>
+        <ul class="list-decimal ml-5 space-y-1 text-sm">
+          <li><strong>Memperoleh Ridha Allah:</strong> Niat utamanya adalah ibadah.</li>
+          <li><strong>Waktu Lebih Produktif:</strong> Tidak ada waktu terbuang untuk hal sia-sia (laghwun).</li>
+          <li><strong>Mempercepat Kebaikan:</strong> Menunda kebaikan bisa mendatangkan halangan, maka kompetisi mendorong penyegeraan.</li>
+          <li><strong>Motivasi Diri:</strong> Terpacu untuk meningkatkan kualitas diri (upgrade skill) agar bisa berbuat lebih banyak.</li>
+          <li><strong>Lingkungan Positif:</strong> Menciptakan suasana saling mendukung dalam kebenaran.</li>
+        </ul>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Mengapa kompetisi dalam kebaikan (fastabiqul khairat) dianjurkan dalam Islam?",
+        jawab: "Karena umur manusia terbatas dan kematian bisa datang kapan saja. Kompetisi dalam kebaikan memastikan kita memanfaatkan sisa umur sebaik mungkin untuk bekal akhirat dan tidak tertipu oleh kemalasan."
+      },
+      {
+        tanya: "Sebutkan 3 manfaat perilaku kompetitif dalam kebaikan bagi seorang pelajar!",
+        jawab: "1. Menjadi pribadi yang disiplin waktu. 2. Selalu ingin berprestasi dan meningkatkan kemampuan. 3. Terhindar dari pergaulan bebas atau kegiatan yang tidak bermanfaat."
+      }
+    ]
+  },
+
+  // --- ELEMEN 2: AKIDAH (Modul 10.02) ---
+  {
+    id: 4,
+    elemen: "Akidah",
+    indikator: "Menjelaskan pengertian Iman secara istilah",
+    sumber: "Modul 10.02 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Definisi Iman (Syu'abul Iman):</strong></p>
+        <p>Dalam kitab <em>Qamiuth-Thughyan</em> karya Syekh Nawawi Al-Bantani (dikutip di Modul), Iman memiliki 3 dimensi/unsur utama:</p>
+        <div class="grid grid-cols-1 gap-2 text-sm">
+          <div class="bg-blue-50 p-2 rounded">1. <strong>Tashdiqun bil Qalbi</strong>: Membenarkan/meyakini dengan hati.</div>
+          <div class="bg-blue-50 p-2 rounded">2. <strong>Iqrarun bil Lisan</strong>: Mengucapkan dengan lisan (Syahadat).</div>
+          <div class="bg-blue-50 p-2 rounded">3. <strong>'Amalun bil Arkan</strong>: Mengamalkan dengan anggota tubuh.</div>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">"Iman itu bukan angan-angan, tetapi apa yang mantap di hati dan dibuktikan dengan amal."</p>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Jelaskan pengertian Iman secara istilah (terminologi) yang lengkap!",
+        jawab: "Iman adalah keyakinan yang dibenarkan dalam hati (Tashdiqun bil qalbi), diikrarkan dengan lisan (Iqrarun bil lisan), dan dibuktikan dengan amal perbuatan anggota badan ('Amalun bil arkan)."
+      },
+      {
+        tanya: "Mengapa iman tidak cukup hanya dalam hati saja?",
+        jawab: "Karena iman yang sempurna menuntut pembuktian (aktualisasi). Jika hanya di hati tanpa amal, itu belum sempurna. Sebaliknya, amal tanpa iman di hati adalah kemunafikan. Ketiga unsur (hati, lisan, amal) adalah satu kesatuan."
+      }
+    ]
+  },
+  {
+    id: 5,
+    elemen: "Akidah",
+    indikator: "Menyebutkan rukun iman dan rukun islam",
+    sumber: "Modul 10.02 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Pilar Agama Islam:</strong></p>
+        <div class="flex flex-col md:flex-row gap-4 text-sm">
+          <div class="flex-1 border p-2 rounded">
+            <strong>Rukun Iman (6):</strong>
+            <ol class="list-decimal ml-4 mt-1">
+              <li>Iman kepada Allah</li>
+              <li>Iman kepada Malaikat</li>
+              <li>Iman kepada Kitab-kitab</li>
+              <li>Iman kepada Rasul</li>
+              <li>Iman kepada Hari Akhir</li>
+              <li>Iman kepada Qada & Qadar</li>
+            </ol>
+          </div>
+          <div class="flex-1 border p-2 rounded">
+            <strong>Rukun Islam (5):</strong>
+            <ol class="list-decimal ml-4 mt-1">
+              <li>Syahadat</li>
+              <li>Shalat</li>
+              <li>Zakat</li>
+              <li>Puasa</li>
+              <li>Haji (bagi yang mampu)</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Sebutkan 6 Rukun Iman secara berurutan!",
+        jawab: "1. Iman kepada Allah. 2. Iman kepada Malaikat. 3. Iman kepada Kitab. 4. Iman kepada Rasul. 5. Iman kepada Hari Kiamat. 6. Iman kepada Qada dan Qadar."
+      },
+      {
+        tanya: "Apa perbedaan mendasar antara Rukun Iman dan Rukun Islam?",
+        jawab: "Rukun Iman berkaitan dengan aspek keyakinan (akidah/batiniah), sedangkan Rukun Islam berkaitan dengan aspek perbuatan/amal nyata (syariah/lahiriah) sebagai bukti keimanan."
+      }
+    ]
+  },
+
+  // --- ELEMEN 3: AKHLAK (Modul 10.03) ---
+  {
+    id: 6,
+    elemen: "Akhlak",
+    indikator: "Menyebutkan apa saja dampak dari berfoya-foya",
+    sumber: "Modul 10.03 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Tabdzir (Boros) & Israf (Berlebihan):</strong></p>
+        <p>Dampak negatif perilaku foya-foya (Hedonisme):</p>
+        <ul class="list-disc ml-5 space-y-1 text-sm">
+          <li><strong>Memicu Sifat Kikir:</strong> Karena uang habis untuk kesenangan sendiri, jadi berat untuk sedekah.</li>
+          <li><strong>Lalai Mengingat Allah:</strong> Sibuk dengan kemewahan dunia.</li>
+          <li><strong>Menimbulkan Kesenjangan Sosial:</strong> Menyakiti hati orang miskin.</li>
+          <li><strong>Sumber Penyakit Hati:</strong> Memicu sombong dan pamer.</li>
+          <li><strong>Menjadi Saudara Setan:</strong> "Sesungguhnya pemboros itu adalah saudara syaitan." (QS. Al-Isra: 27).</li>
+        </ul>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Jelaskan dampak negatif gaya hidup berfoya-foya terhadap kondisi sosial masyarakat!",
+        jawab: "Gaya hidup foya-foya dapat menimbulkan kecemburuan sosial, memperlebar jurang antara si kaya dan si miskin, serta mengurangi kepedulian sosial (solidaritas) karena harta hanya berputar untuk kesenangan pribadi."
+      },
+      {
+        tanya: "Apa perbedaan antara Tabdzir dan Israf?",
+        jawab: "Tabdzir adalah membelanjakan harta untuk hal yang haram atau tidak bermanfaat (pemborosan). Israf adalah berlebih-lebihan dalam hal yang halal (misal: makan halal tapi kekenyangan sampai tidak bisa jalan)."
+      }
+    ]
+  },
+  {
+    id: 7,
+    elemen: "Akhlak",
+    indikator: "Menjelaskan disertai contoh sikap riya’, takabbur dan hasad",
+    sumber: "Modul 10.03 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <div class="border-l-4 border-red-400 pl-2">
+          <strong>Riya' (Pamer):</strong> Beramal untuk dilihat/dipuji orang.<br/>
+          <em>Contoh:</em> Shalatnya dikhusyuk-khusyukkan saat ada guru/camer.
+        </div>
+        <div class="border-l-4 border-orange-400 pl-2">
+          <strong>Takabbur (Sombong):</strong> Menolak kebenaran & meremehkan orang lain.<br/>
+          <em>Contoh:</em> Tidak mau menerima nasihat teman karena merasa lebih pintar/kaya.
+        </div>
+        <div class="border-l-4 border-yellow-400 pl-2">
+          <strong>Hasad (Dengki):</strong> Tidak suka orang lain dapat nikmat & ingin nikmat itu hilang.<br/>
+          <em>Contoh:</em> Sakit hati melihat tetangga beli mobil baru, lalu menjelek-jelekkannya.
+        </div>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Berikan contoh perilaku Riya' dalam ibadah dan Riya' dalam sosial!",
+        jawab: "Riya' Ibadah: Memperbagus bacaan Al-Quran hanya saat didengar orang. Riya' Sosial: Bersedekah besar hanya agar namanya disebut-sebut sebagai donatur di panggung."
+      },
+      {
+        tanya: "Apa definisi Takabbur menurut Hadis Nabi?",
+        jawab: "Takabbur (sombong) adalah 'Batharul haq wa ghamtun naas', yaitu menolak kebenaran dan meremehkan/merendahkan orang lain."
+      }
+    ]
+  },
+  {
+    id: 8,
+    elemen: "Akhlak",
+    indikator: "Menjelaskan bahaya dari sikap hasad",
+    sumber: "Modul 10.03 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Bahaya Hasad (Dengki):</strong></p>
+        <ul class="list-disc ml-5 space-y-1 text-sm">
+          <li><strong>Menghapus Amal Kebaikan:</strong> "Jauhilah hasad, karena hasad memakan kebaikan seperti api memakan kayu bakar." (HR. Abu Dawud).</li>
+          <li><strong>Menentang Takdir Allah:</strong> Orang hasad pada hakikatnya tidak terima dengan pembagian rezeki yang Allah tetapkan.</li>
+          <li><strong>Menyiksa Diri Sendiri:</strong> Hatinya tidak tenang, selalu gelisah melihat orang lain bahagia.</li>
+          <li><strong>Merusak Persaudaraan:</strong> Menimbulkan fitnah dan permusuhan.</li>
+        </ul>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Jelaskan bahaya sikap hasad bagi pelaku itu sendiri (secara psikologis dan spiritual)!",
+        jawab: "Secara spiritual: Hasad menghapus pahala amal kebaikan. Secara psikologis: Hasad membuat hati sempit, tidak tenang, selalu gelisah, dan menderita batin karena sibuk memikirkan kenikmatan orang lain."
+      },
+      {
+        tanya: "Apa maksud sabda Nabi: 'Hasad memakan kebaikan seperti api memakan kayu bakar'?",
+        jawab: "Maksudnya adalah sifat dengki dapat menghancurkan atau menghapus pahala amal saleh yang sudah susah payah dikumpulkan, hingga habis tak bersisa, sama cepatnya seperti api yang melalap kayu kering."
+      }
+    ]
+  },
+
+  // --- ELEMEN 4: FIKIH (Modul 4 HI) ---
+  {
+    id: 9,
+    elemen: "Fikih",
+    indikator: "Menyebutkan pokok-pokok ajaran Al-Quran",
+    sumber: "Modul 4 HI / Umum",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Pokok Kandungan Al-Qur'an:</strong></p>
+        <ol class="list-decimal ml-5 space-y-1 text-sm">
+          <li><strong>Akidah:</strong> Keyakinan, Tauhid, Rukun Iman.</li>
+          <li><strong>Syariah/Ibadah & Muamalah:</strong> Hukum, tata cara ibadah, hubungan antar manusia.</li>
+          <li><strong>Akhlak:</strong> Budi pekerti mulia (kepada Allah, sesama, alam).</li>
+          <li><strong>Tarikh/Qishash:</strong> Sejarah umat terdahulu sebagai pelajaran.</li>
+          <li><strong>Wa'ad wal Wa'id:</strong> Janji pahala dan ancaman siksa.</li>
+          <li><strong>Dasar Sains:</strong> Isyarat ilmu pengetahuan.</li>
+        </ol>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Sebutkan 5 pokok ajaran utama yang terkandung dalam Al-Qur'an!",
+        jawab: "1. Akidah (Keimanan). 2. Syariah (Hukum/Ibadah). 3. Akhlak (Perilaku). 4. Tarikh (Sejarah). 5. Janji dan Ancaman (Wa'ad wal Wa'id)."
+      },
+      {
+        tanya: "Jelaskan apa yang dimaksud dengan kandungan 'Tarikh' dalam Al-Qur'an!",
+        jawab: "Tarikh adalah kisah-kisah sejarah umat terdahulu (seperti kisah para Nabi dan kaum yang dibinasakan) yang diceritakan dalam Al-Qur'an bukan sekadar sebagai dongeng, tetapi sebagai 'Ibrah (pelajaran) bagi umat Nabi Muhammad SAW."
+      }
+    ]
+  },
+  {
+    id: 10,
+    elemen: "Fikih",
+    indikator: "Menjelaskan fungsi dari sumber hukum islam Hadis",
+    sumber: "Modul 4 HI",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Fungsi Hadis terhadap Al-Qur'an:</strong></p>
+        <ul class="list-disc ml-5 space-y-2 text-sm">
+          <li><strong>Bayan Taqrir (Penguat):</strong> Memperkuat hukum yang sudah ada di Al-Qur'an. (Cth: Perintah Sholat).</li>
+          <li><strong>Bayan Tafsir (Penjelas):</strong> Merinci ayat yang masih umum (Mujmal). (Cth: Cara sholat, jumlah rakaat).</li>
+          <li><strong>Bayan Tasyri' (Penetap Hukum):</strong> Menetapkan hukum baru yang tidak disebut di Al-Qur'an. (Cth: Haramnya binatang buas bertaring).</li>
+          <li><strong>Bayan Nasakh (Penghapus):</strong> Menghapus/mengganti hukum terdahulu (menurut sebagian ulama).</li>
+        </ul>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Jelaskan fungsi Hadis sebagai 'Bayan Tafsir'!",
+        jawab: "Bayan Tafsir artinya Hadis berfungsi menjelaskan, merinci, atau menafsirkan ayat-ayat Al-Qur'an yang masih bersifat umum (global). Contohnya: Al-Qur'an memerintahkan sholat, Hadis menjelaskan tata cara ruku', sujud, dan bacaannya."
+      },
+      {
+        tanya: "Berikan contoh fungsi Hadis sebagai 'Bayan Tasyri'!",
+        jawab: "Bayan Tasyri' adalah menetapkan hukum yang tidak ada dalam Al-Qur'an. Contohnya: Haramnya memakan binatang buas yang bertaring dan burung yang berkuku tajam, serta haramnya memakai sutra bagi laki-laki."
+      }
+    ]
+  },
+  {
+    id: 11,
+    elemen: "Fikih",
+    indikator: "Menjelaskan tentang macam-macam hadis",
+    sumber: "Modul 4 HI",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Klasifikasi Hadis:</strong></p>
+        <p><strong>1. Berdasarkan Bentuk:</strong></p>
+        <ul class="list-disc ml-5 mb-2 text-sm">
+          <li><em>Qauli:</em> Ucapan Nabi.</li>
+          <li><em>Fi'li:</em> Perbuatan Nabi.</li>
+          <li><em>Taqrir:</em> Ketetapan/Diamnya Nabi tanda setuju.</li>
+        </ul>
+        <p><strong>2. Berdasarkan Kualitas (Sanad/Matan):</strong></p>
+        <ul class="list-disc ml-5 text-sm">
+          <li><em>Shahih:</em> Sanad bersambung, perawi adil & dhabit, tidak syadz/illat.</li>
+          <li><em>Hasan:</em> Seperti shahih tapi kedabitan (hafalan) perawi sedikit di bawahnya.</li>
+          <li><em>Dhaif:</em> Lemah, tidak memenuhi syarat shahih/hasan.</li>
+          <li><em>Maudhu':</em> Palsu (dibuat-buat).</li>
+        </ul>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Jelaskan perbedaan antara Hadis Qauli, Fi'li, dan Taqrir!",
+        jawab: "Hadis Qauli adalah segala ucapan/perkataan Nabi. Hadis Fi'li adalah segala perbuatan/tindakan Nabi yang dilihat sahabat. Hadis Taqrir adalah persetujuan Nabi (diamnya Nabi) terhadap perbuatan sahabat yang dilakukan di hadapan beliau."
+      },
+      {
+        tanya: "Sebutkan syarat-syarat sebuah hadis dikategorikan sebagai Hadis Shahih!",
+        jawab: "1. Sanadnya bersambung. 2. Perawinya Adil (bertaqwa). 3. Perawinya Dhabit (kuat hafalan). 4. Tidak ada Syadz (kejanggalan). 5. Tidak ada 'Illat (cacat tersembunyi)."
+      }
+    ]
+  },
+  {
+    id: 12,
+    elemen: "Fikih",
+    indikator: "Menjelaskan pengertian Ijma’ dan Qiyas",
+    sumber: "Modul 4 HI",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Sumber Hukum Islam (Ijtihad):</strong></p>
+        <div class="border p-2 rounded bg-slate-50 text-sm">
+          <strong>Ijma':</strong> Kesepakatan seluruh ulama mujtahid umat Islam pada suatu masa setelah wafatnya Nabi SAW terhadap suatu hukum syar'i. (Cth: Kesepakatan pembukuan Al-Qur'an).
+        </div>
+        <div class="border p-2 rounded bg-slate-50 text-sm mt-2">
+          <strong>Qiyas:</strong> Menyamakan hukum suatu kejadian yang tidak ada nash-nya dengan kejadian yang ada nash-nya karena adanya kesamaan <em>illat</em> (sebab hukum). (Cth: Narkoba dikiaskan dengan Khamr karena sama-sama memabukkan).
+        </div>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Jelaskan pengertian Qiyas dan sebutkan rukun-rukunnya!",
+        jawab: "Qiyas adalah menetapkan hukum perkara baru dengan menyamakannya pada perkara lama yang ada dalilnya karena persamaan sebab (illat). Rukunnya: 1. Asal (kasus lama). 2. Far'u (kasus baru). 3. Hukum Asal. 4. Illat (Sebab hukum)."
+      },
+      {
+        tanya: "Berikan contoh penerapan Qiyas dalam kehidupan modern!",
+        jawab: "Contohnya mengharamkan Narkoba (sabu-sabu, ekstasi). Di Al-Qur'an tidak ada kata 'narkoba', tapi ada larangan 'Khamr' (miras). Karena illat (sebab)-nya sama yaitu 'memabukkan/merusak akal', maka Narkoba dihukumi haram sebagaimana Khamr."
+      }
+    ]
+  },
+
+  // --- ELEMEN 5: SEJARAH (Modul 10.05) ---
+  {
+    id: 13,
+    elemen: "Sejarah",
+    indikator: "Menyebutkan tokoh penyebar islam di Indonesia",
+    sumber: "Modul 10.05 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Tokoh & Saluran Penyebaran:</strong></p>
+        <ul class="list-disc ml-5 space-y-1 text-sm">
+          <li><strong>Pedagang:</strong> Dari Arab, Gujarat, Persia. Berdakwah sambil berdagang.</li>
+          <li><strong>Wali Songo:</strong> Fokus di Pulau Jawa.</li>
+          <li><strong>Sultan/Raja:</strong> Sultan Malik Al-Saleh (Samudra Pasai), Sultan Alauddin (Gowa-Tallo), Sultan Zainal Abidin (Ternate).</li>
+          <li><strong>Ulama Minang:</strong> Datuk Ri Bandang, Datuk Tunggang Parangan (Menyebar ke Sulawesi & Kutai).</li>
+        </ul>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Sebutkan golongan-golongan utama penyebar agama Islam pertama kali di Indonesia!",
+        jawab: "1. Kaum Pedagang (Arab, Gujarat, Persia). 2. Kaum Mubaligh/Ulama (termasuk Wali Songo). 3. Kaum Sufi (Tasawuf). 4. Para Raja/Sultan yang masuk Islam."
+      },
+      {
+        tanya: "Siapakah tokoh ulama yang menyebarkan Islam di wilayah Kerajaan Gowa-Tallo (Sulawesi) dan Kutai?",
+        jawab: "Datuk Ri Bandang (bersama Datuk Patimang dan Datuk Ri Tiro) dan Datuk Tunggang Parangan."
+      }
+    ]
+  },
+  {
+    id: 14,
+    elemen: "Sejarah",
+    indikator: "Menyebutkan nama-nama Wali Songo",
+    sumber: "Modul 10.05 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>The Nine Saints (Wali Songo):</strong></p>
+        <table class="w-full text-xs border border-collapse">
+          <tr class="bg-emerald-100"><th class="border p-1">Nama Julukan</th><th class="border p-1">Nama Asli</th><th class="border p-1">Wilayah</th></tr>
+          <tr><td class="border p-1">S. Gresik</td><td class="border p-1">Maulana Malik Ibrahim</td><td class="border p-1">Gresik</td></tr>
+          <tr><td class="border p-1">S. Ampel</td><td class="border p-1">Raden Rahmat</td><td class="border p-1">Surabaya</td></tr>
+          <tr><td class="border p-1">S. Bonang</td><td class="border p-1">Makdum Ibrahim</td><td class="border p-1">Tuban</td></tr>
+          <tr><td class="border p-1">S. Drajat</td><td class="border p-1">Raden Qosim</td><td class="border p-1">Lamongan</td></tr>
+          <tr><td class="border p-1">S. Kudus</td><td class="border p-1">Ja'far Shadiq</td><td class="border p-1">Kudus</td></tr>
+          <tr><td class="border p-1">S. Giri</td><td class="border p-1">Raden Paku</td><td class="border p-1">Gresik</td></tr>
+          <tr><td class="border p-1">S. Kalijaga</td><td class="border p-1">Raden Said</td><td class="border p-1">Demak</td></tr>
+          <tr><td class="border p-1">S. Muria</td><td class="border p-1">Raden Umar Said</td><td class="border p-1">G. Muria</td></tr>
+          <tr><td class="border p-1">S. Gunung Jati</td><td class="border p-1">Syarif Hidayatullah</td><td class="border p-1">Cirebon</td></tr>
+        </table>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Sebutkan nama asli dari Sunan Ampel, Sunan Kalijaga, dan Sunan Gunung Jati!",
+        jawab: "Sunan Ampel = Raden Rahmat. Sunan Kalijaga = Raden Said. Sunan Gunung Jati = Syarif Hidayatullah."
+      },
+      {
+        tanya: "Sebutkan strategi dakwah Sunan Kalijaga yang paling terkenal!",
+        jawab: "Menggunakan sarana seni dan budaya lokal, seperti Wayang Kulit dan Tembang (Lir-Ilir), dengan memasukkan nilai-nilai Islam di dalamnya tanpa menghapus budaya asli secara frontal."
+      }
+    ]
+  },
+  {
+    id: 15,
+    elemen: "Sejarah",
+    indikator: "Mengenal keteladanan para Ulama penyebar agama Islam di Indoensia",
+    sumber: "Modul 10.05 Gasal",
+    materi: `
+      <div class="space-y-3">
+        <p class="font-medium"><strong>Nilai Keteladanan:</strong></p>
+        <ul class="list-disc ml-5 space-y-1 text-sm">
+          <li><strong>Hidup Sederhana:</strong> Meski berpengaruh, mereka tidak gila harta.</li>
+          <li><strong>Gigih Berjuang:</strong> Pantang menyerah meski medannya sulit (hutan/gunung).</li>
+          <li><strong>Menguasai Ilmu Agama:</strong> Sanad keilmuan yang jelas dan mendalam.</li>
+          <li><strong>Menghargai Perbedaan:</strong> Toleran terhadap budaya lokal (Akulturasi).</li>
+          <li><strong>Dakwah Damai:</strong> <em>Bil-Hikmah</em>, tanpa kekerasan.</li>
+        </ul>
+      </div>
+    `,
+    bank_soal: [
+      {
+        tanya: "Sebutkan 3 nilai keteladanan utama dari para ulama penyebar Islam di Indonesia!",
+        jawab: "1. Semangat dakwah yang gigih dan pantang menyerah. 2. Hidup sederhana (zuhud) dan tidak cinta dunia. 3. Dakwah dengan cara damai, santun, dan toleran (menghargai budaya lokal)."
+      },
+      {
+        tanya: "Bagaimana sikap para ulama terhadap budaya lokal yang sudah ada sebelum Islam datang?",
+        jawab: "Mereka bersikap toleran dan akomodatif. Budaya yang bertentangan dengan syariat diluruskan secara perlahan (akulturasi), sedangkan budaya yang baik tetap dilestarikan dan diisi dengan nilai-nilai Islam (seperti Wayang, Slametan diganti doa)."
+      }
+    ]
+  }
+];
+
+// ============================================================================
+// KOMPONEN UTAMA APLIKASI
+// ============================================================================
+
+const StudyApp = () => {
+  const [activeId, setActiveId] = useState(1);
+  const [activeTab, setActiveTab] = useState('materi'); // 'materi' or 'soal'
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [revealedAnswers, setRevealedAnswers] = useState({});
+
+  // Filter data berdasarkan pencarian
+  const filteredData = useMemo(() => {
+    if (!searchQuery) return DATA_INDIKATOR;
+    return DATA_INDIKATOR.filter(item => 
+      item.indikator.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.elemen.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
+
+  const activeItem = DATA_INDIKATOR.find(item => item.id === activeId) || DATA_INDIKATOR[0];
+
+  const toggleAnswer = (soalIndex) => {
+    const key = `${activeId}-${soalIndex}`;
+    setRevealedAnswers(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const getIcon = (elemen) => {
+    if (elemen.includes("Al-Qur'an")) return <Book className="w-4 h-4" />;
+    if (elemen.includes("Akidah")) return <Users className="w-4 h-4" />;
+    if (elemen.includes("Akhlak")) return <Heart className="w-4 h-4" />;
+    if (elemen.includes("Fikih")) return <Gavel className="w-4 h-4" />;
+    if (elemen.includes("Sejarah")) return <History className="w-4 h-4" />;
+    return <BookOpen className="w-4 h-4" />;
+  };
+
+  const getElemenColor = (elemen) => {
+    if (elemen.includes("Al-Qur'an")) return "bg-emerald-100 text-emerald-700 border-emerald-200";
+    if (elemen.includes("Akidah")) return "bg-blue-100 text-blue-700 border-blue-200";
+    if (elemen.includes("Akhlak")) return "bg-pink-100 text-pink-700 border-pink-200";
+    if (elemen.includes("Fikih")) return "bg-purple-100 text-purple-700 border-purple-200";
+    if (elemen.includes("Sejarah")) return "bg-amber-100 text-amber-700 border-amber-200";
+    return "bg-gray-100 text-gray-700";
+  };
+
+  return (
+    <div className="flex h-screen bg-slate-50 font-sans text-slate-800 overflow-hidden">
+      
+      {/* --- SIDEBAR NAVIGATION --- */}
+      <div className={`${showSidebar ? 'w-80' : 'w-0'} bg-white border-r border-slate-200 flex-shrink-0 transition-all duration-300 flex flex-col`}>
+        <div className="p-4 border-b border-slate-100">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="bg-emerald-600 p-2 rounded-lg">
+              <BookOpen className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-lg leading-tight">Bank Soal PAI</h1>
+              <p className="text-xs text-slate-500">Edisi Lengkap ASAS 2025</p>
+            </div>
+          </div>
+          
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Cari indikator..." 
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+          {filteredData.length === 0 ? (
+            <div className="text-center py-8 text-slate-400 text-sm">
+              Tidak ditemukan indikator yang cocok.
+            </div>
+          ) : (
+            filteredData.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => { setActiveId(item.id); setActiveTab('materi'); }}
+                className={`w-full text-left p-3 rounded-lg text-sm transition-all group relative ${
+                  activeId === item.id 
+                    ? 'bg-emerald-50 border border-emerald-200 shadow-sm' 
+                    : 'hover:bg-slate-50 border border-transparent hover:border-slate-100'
+                }`}
+              >
+                <div className="flex justify-between items-start gap-2 mb-1">
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${getElemenColor(item.elemen)}`}>
+                    {item.elemen}
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">#{item.id}</span>
+                </div>
+                <p className={`font-medium leading-snug ${activeId === item.id ? 'text-emerald-900' : 'text-slate-700'}`}>
+                  {item.indikator}
+                </p>
+                {activeId === item.id && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-emerald-500 rounded-r"></div>
+                )}
+              </button>
+            ))
+          )}
+        </div>
+        
+        <div className="p-3 border-t border-slate-100 text-center">
+          <p className="text-xs text-slate-400">Total {DATA_INDIKATOR.length} Indikator Soal</p>
+        </div>
+      </div>
+
+      {/* --- MAIN CONTENT --- */}
+      <div className="flex-1 flex flex-col min-w-0 h-full">
+        {/* Header */}
+        <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 shadow-sm z-10">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <div>
+              <h2 className="font-bold text-lg text-slate-800 line-clamp-1">
+                Indikator #{activeItem.id}: {activeItem.indikator}
+              </h2>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+             <span className="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+               Sumber: {activeItem.sumber}
+             </span>
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <main className="flex-1 overflow-y-auto bg-slate-50 p-4 md:p-8">
+          <div className="max-w-4xl mx-auto space-y-6">
+            
+            {/* Tabs */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-1 inline-flex gap-1 w-full md:w-auto">
+              <button
+                onClick={() => setActiveTab('materi')}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+                  activeTab === 'materi' 
+                    ? 'bg-emerald-100 text-emerald-800 shadow-sm ring-1 ring-emerald-200' 
+                    : 'text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                <Book className="w-4 h-4" />
+                Ringkasan Materi
+              </button>
+              <button
+                onClick={() => setActiveTab('soal')}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+                  activeTab === 'soal' 
+                    ? 'bg-emerald-100 text-emerald-800 shadow-sm ring-1 ring-emerald-200' 
+                    : 'text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                <ListChecks className="w-4 h-4" />
+                Bank Soal ({activeItem.bank_soal.length})
+              </button>
+            </div>
+
+            {/* Content Display */}
+            <div className="bg-white rounded-2xl shadow-md border border-slate-200 min-h-[500px] relative overflow-hidden">
+              
+              {/* Decoration */}
+              <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+                {getIcon(activeItem.elemen)}
+              </div>
+
+              {activeTab === 'materi' ? (
+                <div className="p-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                      <Lightbulb className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-800">Pembahasan Materi</h3>
+                  </div>
+                  
+                  <div className="prose prose-emerald max-w-none text-slate-700 leading-relaxed bg-slate-50 p-6 rounded-xl border border-slate-100">
+                    <div dangerouslySetInnerHTML={{ __html: activeItem.materi }} />
+                  </div>
+
+                  <div className="mt-8 bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-start gap-3">
+                    <Brain className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-bold text-blue-800 text-sm mb-1">Tips Belajar</h4>
+                      <p className="text-sm text-blue-700">Pahami kata kunci pada materi di atas untuk menjawab berbagai variasi soal uraian yang mungkin muncul.</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                      <Trophy className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-800">Latihan Soal Uraian</h3>
+                      <p className="text-sm text-slate-500">Cobalah jawab sendiri sebelum melihat kunci jawaban.</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    {activeItem.bank_soal.map((soal, idx) => {
+                      const isRevealed = revealedAnswers[`${activeId}-${idx}`];
+                      
+                      return (
+                        <div key={idx} className="group">
+                          <div className="flex gap-4">
+                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
+                              {idx + 1}
+                            </span>
+                            <div className="flex-1 space-y-3">
+                              <p className="font-medium text-lg text-slate-800">{soal.tanya}</p>
+                              
+                              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isRevealed ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100 relative mt-2">
+                                  <div className="absolute top-4 left-4 w-1 h-full bg-emerald-400 rounded-full max-h-[calc(100%-32px)]"></div>
+                                  <p className="text-slate-700 pl-4 text-sm leading-relaxed">
+                                    <strong className="block text-emerald-800 mb-1 text-xs uppercase tracking-wider">Jawaban:</strong>
+                                    {soal.jawab}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <button 
+                                onClick={() => toggleAnswer(idx)}
+                                className="text-sm font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+                              >
+                                {isRevealed ? (
+                                  <>Tutup Jawaban <ChevronDown className="w-4 h-4" /></>
+                                ) : (
+                                  <>Lihat Kunci Jawaban <ChevronRight className="w-4 h-4" /></>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                          {idx !== activeItem.bank_soal.length - 1 && (
+                            <hr className="my-6 border-slate-100" />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default StudyApp;
